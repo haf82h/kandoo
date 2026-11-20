@@ -1,0 +1,549 @@
+
+export default {
+  async fetch(request, env) {
+    const cors = {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type"
+    };
+
+    const respond = (data, status = 200) =>
+      new Response(JSON.stringify(data), {
+        status,
+        headers: {
+          ...cors,
+          "Content-Type": "application/json; charset=UTF-8"
+        }
+      });
+
+    if (request.method === "OPTIONS") {
+      return new Response(null, { headers: cors });
+    }
+
+    // صفحه اصلی
+    if (request.method === "GET") {
+      const html = `<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f8f1df">
+<meta name="color-scheme" content="light dark">
+<title>کندو | دستیار هوش مصنوعی</title>
+<style>
+@font-face{font-family:Vazirmatn;src:url('/Vazirmatn.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{
+  font-family:Vazirmatn,Tahoma,sans-serif;
+  color-scheme:light;
+  --page:#f8f1df;--surface:#fffaf0;--surface-2:#f5ecd8;--surface-3:#efe4cc;
+  --text:#28271f;--muted:#827b6d;--line:#eadfc8;--accent:#f4c735;
+  --accent-hover:#e9b91d;--accent-ink:#30280e;--bubble:#fff0c4;
+  --shadow:0 12px 34px rgba(89,67,20,.07);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden}
+body{background:var(--page);color:var(--text);transition:background .22s,color .22s}
+body.dark{
+  color-scheme:dark;
+  --page:#20201e;--surface:#282825;--surface-2:#30302c;--surface-3:#393832;
+  --text:#f0eee7;--muted:#aaa69a;--line:#414039;--accent:#f2c638;
+  --accent-hover:#ffda55;--accent-ink:#28220f;--bubble:#38352b;
+  --shadow:0 14px 38px rgba(0,0,0,.18);
+}
+button,textarea{font:inherit}
+button{cursor:pointer}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.app{height:100dvh;width:100%;display:flex;padding:16px;gap:14px}
+.sidebar{
+ width:270px;flex:0 0 270px;background:var(--surface);border:1px solid var(--line);
+ border-radius:25px;padding:20px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)
+}
+.brandline{display:flex;align-items:center;gap:11px;padding:3px 2px 10px}
+.brandmark{
+ width:43px;height:43px;border:2px solid var(--accent);border-radius:14px;
+ display:grid;place-items:center;color:var(--accent);font-size:23px;font-weight:800;
+ background:linear-gradient(145deg,rgba(244,199,53,.18),transparent)
+}
+.brandname{font-size:23px;font-weight:850;letter-spacing:-.7px}
+.brandtag{font-size:11px;color:var(--muted);margin-top:1px}
+.new-chat{
+ border:1px solid var(--line);background:var(--surface-2);border-radius:15px;
+ padding:13px 14px;text-align:right;color:var(--text);transition:.18s
+}
+.new-chat:hover,.side-button:hover,.history-item:hover{background:var(--surface-3)}
+.section-title{font-size:11px;color:var(--muted);margin:3px 0 8px}
+.history{overflow:auto;display:flex;flex-direction:column;gap:5px}
+.history-item{
+ border:0;background:transparent;text-align:right;color:var(--text);padding:11px 12px;
+ border-radius:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px
+}
+.history-item.active{background:var(--surface-2)}
+.side-bottom{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.side-button{background:transparent;border:0;color:var(--text);padding:12px;text-align:right;border-radius:12px}
+.main{
+ flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;
+ background:var(--surface);border:1px solid var(--line);border-radius:27px;
+ overflow:hidden;box-shadow:var(--shadow);position:relative
+}
+.topbar{
+ min-height:76px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 24px;border-bottom:1px solid var(--line);background:var(--surface)
+}
+.top-left,.top-right{display:flex;align-items:center;gap:13px}
+.icon-btn{
+ width:41px;height:41px;border:0;border-radius:50%;background:var(--surface-2);
+ color:var(--text);font-size:19px;display:grid;place-items:center;transition:.18s
+}
+.icon-btn:hover{background:var(--surface-3)}
+.mobile-brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:850}
+.mobile-brand .brandmark{width:37px;height:37px;border-radius:12px;font-size:20px}
+.top-label{font-size:12px;color:var(--muted)}
+.content{
+ flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;
+ padding:28px 22px 14px;scroll-behavior:smooth
+}
+.welcome{margin:auto 0;max-width:700px;width:100%;text-align:center;padding:24px 0}
+.welcome-logo{
+ width:66px;height:66px;border:2px solid var(--accent);border-radius:22px;
+ display:grid;place-items:center;margin:0 auto 18px;color:var(--accent);font-size:32px;
+ background:var(--surface-2);box-shadow:0 7px 20px rgba(190,145,22,.10)
+}
+.welcome h1{font-size:25px;margin:0 0 9px;font-weight:800}
+.welcome p{font-size:14px;color:var(--muted);line-height:2;margin:0}
+.shortcuts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:27px auto 0;max-width:520px}
+.shortcut{
+ background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+ border-radius:15px;padding:14px 12px;font-size:13px;transition:.18s
+}
+.shortcut:hover{border-color:var(--accent);background:var(--surface-3)}
+.shortcut:disabled{opacity:.55;cursor:not-allowed}
+.messages{width:100%;max-width:790px;display:flex;flex-direction:column;gap:20px;padding-bottom:20px}
+.message{display:flex;gap:10px;align-items:flex-start}
+.message.user{flex-direction:row-reverse}
+.avatar{
+ flex:0 0 34px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+ background:var(--surface-2);color:var(--accent-ink);font-size:12px;font-weight:800;border:1px solid var(--line)
+}
+.avatar.ai{border-color:rgba(244,199,53,.5);color:#b18a0b;background:rgba(244,199,53,.13);font-size:18px}
+.bubble{max-width:calc(100% - 48px);font-size:14px;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;padding:5px 2px}
+.user .bubble{background:var(--bubble);padding:11px 16px;border-radius:18px;color:var(--text)}
+.composer-area{width:100%;max-width:790px;margin-top:auto;padding:12px 0 3px}
+.composer{
+ border:1px solid rgba(225,184,55,.65);border-radius:28px;padding:9px 10px 9px 13px;
+ display:flex;align-items:flex-end;gap:9px;background:var(--surface);
+ box-shadow:0 4px 18px rgba(190,145,22,.08)
+}
+.dark .composer{border-color:#62552e;background:#292925;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+textarea{
+ flex:1;min-width:0;resize:none;border:0;outline:0;background:transparent;color:var(--text);
+ font-size:14px;line-height:1.85;max-height:140px;padding:9px 5px
+}
+textarea::placeholder{color:var(--muted)}
+.send{
+ border:0;width:43px;height:43px;flex:0 0 43px;border-radius:50%;
+ background:var(--accent);color:var(--accent-ink);font-size:20px;display:grid;place-items:center;
+ transition:transform .15s,background .15s
+}
+.send:hover{background:var(--accent-hover);transform:translateY(-1px)}
+.send:disabled{opacity:.45;cursor:default;transform:none}
+.attach{border:0;background:transparent;color:var(--muted);width:38px;height:40px;font-size:22px}
+.disclaimer{text-align:center;color:var(--muted);font-size:10px;margin:9px 0 0}
+.mobile-nav{display:none}
+.panel{display:none;width:100%;max-width:790px}
+.panel h2{font-size:22px;margin:8px 0 18px}
+.panel p{color:var(--muted);font-size:14px;line-height:2}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:17px 0;border-bottom:1px solid var(--line);font-size:14px}
+.setting-row button{border:1px solid var(--line);background:var(--surface-2);color:var(--text);padding:9px 14px;border-radius:11px}
+@media(min-width:1100px){.content{padding-top:38px}.welcome h1{font-size:28px}}
+@media(max-width:760px){
+ .app{padding:0;gap:0}
+ .sidebar{
+  display:none;position:fixed;z-index:10;top:10px;bottom:10px;right:10px;width:min(290px,calc(100vw - 20px));
+  box-shadow:0 0 0 100vmax rgba(0,0,0,.35)
+ }
+ .sidebar.open{display:flex}
+ .main{border:0;border-radius:0;box-shadow:none}
+ .topbar{min-height:64px;padding:0 14px}
+ .top-label{display:none}
+ .content{padding:20px 15px 8px}
+ .welcome{padding:20px 0}
+ .welcome h1{font-size:22px}
+ .welcome p{font-size:13px}
+ .shortcuts{gap:8px;margin-top:22px}
+ .shortcut{padding:13px 7px;font-size:12px}
+ .messages{gap:16px}
+ .bubble{font-size:13px}
+ .composer-area{padding-bottom:5px}
+ .mobile-nav{
+  display:flex;justify-content:space-around;gap:4px;padding:8px 5px calc(8px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line);background:var(--surface)
+ }
+ .nav-item{
+  border:0;background:transparent;color:var(--muted);font-size:10px;display:flex;
+  flex-direction:column;align-items:center;gap:3px;padding:4px 12px
+ }
+ .nav-item b{font-size:19px;font-weight:400}
+ .nav-item.active{color:#b18a0b}
+ .disclaimer{font-size:9px}
+}
+@media(max-width:380px){.brandtag{display:none}.welcome h1{font-size:20px}.shortcut{font-size:11px}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brandline">
+    <div class="brandmark" aria-hidden="true">⌘</div>
+    <div><div class="brandname">کندو</div><div class="brandtag">دستیار هوش مصنوعی فارسی</div></div>
+  </div>
+  <button class="new-chat" id="newChat">＋ گفت‌وگوی جدید</button>
+  <div>
+    <div class="section-title">گفت‌وگوهای اخیر</div>
+    <div class="history" id="history"></div>
+  </div>
+  <div class="side-bottom">
+    <button class="side-button" id="themeSide">◐ تغییر پوسته</button>
+    <button class="side-button" id="settingsSide">⚙ تنظیمات</button>
+  </div>
+</aside>
+
+<section class="main">
+  <header class="topbar">
+    <div class="top-left">
+      <button class="icon-btn" id="menuBtn" aria-label="باز کردن منو">☰</button>
+      <div class="mobile-brand"><span class="brandmark" aria-hidden="true">⌘</span><span>کندو</span></div>
+    </div>
+    <div class="top-right">
+      <span class="top-label">دستیار هوش مصنوعی فارسی</span>
+      <button class="icon-btn" id="themeBtn" aria-label="تغییر حالت نمایش">☼</button>
+    </div>
+  </header>
+
+  <main class="content" id="content">
+    <section class="welcome" id="welcome">
+      <div class="welcome-logo" aria-hidden="true">⌘</div>
+      <h1>سلام! به کندو خوش آمدید.</h1>
+      <p>هر چیزی که می‌خواهید بپرسید؛ من اینجا هستم تا کمک کنم.</p>
+      <div class="shortcuts">
+        <button class="shortcut" data-prompt="این متن را خلاصه کن: ">خلاصه کردن متن</button>
+        <button class="shortcut" data-prompt="چند ایده خلاقانه برای من پیشنهاد بده: ">ایده‌های خلاقانه</button>
+        <button class="shortcut" data-prompt="این مفهوم را ساده توضیح بده: ">توضیح مفاهیم</button>
+        <button class="shortcut" disabled>تولید تصویر · به‌زودی</button>
+      </div>
+    </section>
+
+    <section class="messages" id="messages"></section>
+    <section class="panel" id="imagesPanel">
+      <h2>تصاویر</h2><p>قابلیت تولید تصویر به‌زودی به کندو اضافه می‌شود.</p>
+    </section>
+    <section class="panel" id="settingsPanel">
+      <h2>تنظیمات</h2>
+      <div class="setting-row"><span>حالت نمایش</span><button id="themeSetting">تغییر حالت</button></div>
+      <div class="setting-row"><span>نام برنامه</span><strong>کندو</strong></div>
+    </section>
+
+    <div class="composer-area" id="composerArea">
+      <form class="composer" id="chatForm">
+        <button class="attach" type="button" title="به‌زودی" aria-label="پیوست">＋</button>
+        <textarea id="prompt" rows="1" placeholder="پیام خود را بنویسید..." required></textarea>
+        <button class="send" id="sendBtn" type="submit" aria-label="ارسال پیام">➤</button>
+      </form>
+      <div class="disclaimer">کندو ممکن است اشتباه کند؛ پاسخ‌های مهم را بررسی کنید.</div>
+    </div>
+  </main>
+
+  <nav class="mobile-nav">
+    <button class="nav-item active" data-page="chat"><b>●</b>چت</button>
+    <button class="nav-item" data-page="history"><b>◷</b>تاریخچه</button>
+    <button class="nav-item" data-page="images"><b>▧</b>تصاویر</button>
+    <button class="nav-item" data-page="settings"><b>⚙</b>تنظیمات</button>
+  </nav>
+</section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let chats = [];
+let currentId = null;
+let busy = false;
+
+try {
+  chats = JSON.parse(localStorage.getItem("kandoo_chats") || localStorage.getItem("digiai_chats") || "[]");
+  if (!Array.isArray(chats)) chats = [];
+} catch(e) { chats = []; }
+
+function save() {
+  localStorage.setItem("kandoo_chats", JSON.stringify(chats));
+}
+function newId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+}
+function currentChat() {
+  return chats.find(c => c.id === currentId);
+}
+function setTheme(dark) {
+  document.body.classList.toggle("dark", dark);
+  localStorage.setItem("kandoo_theme", dark ? "dark" : "light");
+  $("themeBtn").textContent = dark ? "☾" : "☼";
+  document.querySelector('meta[name="theme-color"]').content = dark ? "#20201e" : "#f8f1df";
+}
+setTheme((localStorage.getItem("kandoo_theme") || localStorage.getItem("digiai_theme")) === "dark");
+
+function showPage(page) {
+  const chatPage = page === "chat";
+  const empty = !currentChat()?.messages.length;
+  $("welcome").style.display = chatPage && empty ? "block" : "none";
+  $("messages").style.display = chatPage ? "flex" : "none";
+  $("composerArea").style.display = chatPage ? "block" : "none";
+  $("imagesPanel").style.display = page === "images" ? "block" : "none";
+  $("settingsPanel").style.display = page === "settings" ? "block" : "none";
+  document.querySelectorAll(".nav-item").forEach(b => b.classList.toggle("active", b.dataset.page === page));
+}
+function renderHistory() {
+  const box = $("history");
+  box.replaceChildren();
+  chats.slice().reverse().forEach(chat => {
+    const btn = document.createElement("button");
+    btn.className = "history-item" + (chat.id === currentId ? " active" : "");
+    btn.textContent = chat.title || "گفت‌وگوی جدید";
+    btn.onclick = () => openChat(chat.id);
+    box.appendChild(btn);
+  });
+}
+function addMessage(role, text) {
+  const item = document.createElement("div");
+  item.className = "message " + (role === "user" ? "user" : "");
+  const avatar = document.createElement("div");
+  avatar.className = "avatar " + (role === "user" ? "" : "ai");
+  avatar.textContent = role === "user" ? "شما" : "ک";
+  const bubble = document.createElement("div");
+  bubble.className = "bubble";
+  bubble.textContent = text;
+  item.append(avatar, bubble);
+  $("messages").appendChild(item);
+  $("content").scrollTo({top:$("content").scrollHeight,behavior:"smooth"});
+  return bubble;
+}
+function renderChat() {
+  $("messages").replaceChildren();
+  const chat = currentChat();
+  if (chat) chat.messages.forEach(m => addMessage(m.role, m.content));
+  showPage("chat");
+  renderHistory();
+}
+function openChat(id) {
+  currentId = id;
+  renderChat();
+  $("sidebar").classList.remove("open");
+}
+function createChat() {
+  const chat = {id:newId(), title:"گفت‌وگوی جدید", messages:[]};
+  chats.push(chat);
+  currentId = chat.id;
+  save();
+  renderChat();
+  $("prompt").focus();
+}
+$("newChat").onclick = createChat;
+$("menuBtn").onclick = () => $("sidebar").classList.toggle("open");
+function toggleTheme() { setTheme(!document.body.classList.contains("dark")); }
+$("themeBtn").onclick = toggleTheme;
+$("themeSide").onclick = toggleTheme;
+$("themeSetting").onclick = toggleTheme;
+$("settingsSide").onclick = () => showPage("settings");
+
+document.querySelectorAll(".shortcut").forEach(btn => {
+  btn.onclick = () => {
+    if (!btn.dataset.prompt) return;
+    if (!currentChat()) createChat();
+    $("prompt").value = btn.dataset.prompt;
+    $("prompt").focus();
+  };
+});
+document.querySelectorAll(".nav-item").forEach(btn => {
+  btn.onclick = () => {
+    if (btn.dataset.page === "history") { $("sidebar").classList.add("open"); return; }
+    showPage(btn.dataset.page);
+  };
+});
+$("prompt").addEventListener("input", function() {
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight, 130) + "px";
+});
+$("chatForm").onsubmit = async event => {
+  event.preventDefault();
+  const text = $("prompt").value.trim();
+  if (!text || busy) return;
+  if (!currentChat()) createChat();
+  const chat = currentChat();
+  chat.messages.push({role:"user", content:text});
+  if (chat.messages.length === 1) chat.title = text.slice(0,35);
+  save();
+  renderChat();
+  $("prompt").value = "";
+  $("prompt").style.height = "auto";
+  busy = true;
+  $("sendBtn").disabled = true;
+  const loading = addMessage("assistant", "در حال فکر کردن...");
+  try {
+    const response = await fetch("https://fragrant-grass-57e8.lvkf494-0e5.workers.dev/", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({messages:chat.messages.slice(-20)})
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.details || data.error || "خطا");
+    const reply = data.reply || "پاسخی دریافت نشد.";
+    loading.textContent = reply;
+    chat.messages.push({role:"assistant", content:reply});
+    save();
+    renderHistory();
+  } catch(error) {
+    loading.textContent = "متأسفانه مشکلی پیش آمد. اتصال را بررسی کنید و دوباره تلاش کنید.";
+    console.error(error);
+  } finally {
+    busy = false;
+    $("sendBtn").disabled = false;
+    $("prompt").focus();
+  }
+};
+if (chats.length) {
+  currentId = chats[chats.length - 1].id;
+  renderChat();
+} else {
+  showPage("chat");
+}
+renderHistory();
+</script>
+</body>
+</html>`;
+
+      return new Response(html, {
+        headers: {
+          "Content-Type": "text/html; charset=UTF-8",
+          "Cache-Control": "no-store"
+        }
+      });
+    }
+
+    // درخواست چت: ابتدا Z.AI و در صورت خطا Groq
+    if (request.method !== "POST") {
+      return respond({ error: "Method not allowed" }, 405);
+    }
+
+    try {
+      const body = await request.json();
+
+      if (!Array.isArray(body.messages)) {
+        return respond({ error: "Invalid messages" }, 400);
+      }
+
+      const messages = body.messages
+        .slice(-20)
+        .filter(m =>
+          ["user", "assistant"].includes(m.role) &&
+          typeof m.content === "string"
+        )
+        .map(m => ({
+          role: m.role,
+          content: m.content.slice(0, 8000)
+        }));
+
+      if (!messages.length ||
+          messages[messages.length - 1].role !== "user") {
+        return respond({ error: "Message required" }, 400);
+      }
+
+      const systemMessage = {
+        role: "system",
+        content: "تو کندو هستی؛ یک دستیار هوش مصنوعی فارسی‌زبان، دوستانه و دقیق. به زبان کاربر پاسخ بده."
+      };
+
+      const failures = [];
+
+      // اولویت اول: Z.AI
+      if (env.ZAI_API_KEY) {
+        try {
+          const result = await fetch(
+            "https://api.z.ai/api/paas/v4/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer " + env.ZAI_API_KEY,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "glm-4.7-flash",
+                messages: [systemMessage, ...messages],
+                max_tokens: 1500
+              })
+            }
+          );
+
+          const data = await result.json().catch(() => ({}));
+
+          if (result.ok) {
+            const reply = data.choices?.[0]?.message?.content;
+            if (typeof reply === "string" && reply.trim()) {
+              return respond({ reply, provider: "zai", model: "glm-4.7-flash" });
+            }
+            failures.push("Z.AI: پاسخ خالی یا نامعتبر");
+          } else {
+            failures.push("Z.AI (" + result.status + "): " +
+              (data.error?.message || data.message || "Request failed"));
+          }
+        } catch (error) {
+          failures.push("Z.AI: اتصال برقرار نشد");
+        }
+      } else {
+        failures.push("Z.AI: کلید API تنظیم نشده است");
+      }
+
+      // اولویت دوم: Groq؛ فقط اگر Z.AI پاسخ نداد
+      if (env.GROQ_API_KEY) {
+        try {
+          const result = await fetch(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                "Authorization": "Bearer " + env.GROQ_API_KEY,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                model: "openai/gpt-oss-20b",
+                messages: [systemMessage, ...messages],
+                max_completion_tokens: 1500
+              })
+            }
+          );
+
+          const data = await result.json().catch(() => ({}));
+
+          if (result.ok) {
+            const reply = data.choices?.[0]?.message?.content;
+            if (typeof reply === "string" && reply.trim()) {
+              return respond({ reply, provider: "groq", model: "openai/gpt-oss-20b" });
+            }
+            failures.push("Groq: پاسخ خالی یا نامعتبر");
+          } else {
+            failures.push("Groq (" + result.status + "): " +
+              (data.error?.message || data.message || "Request failed"));
+          }
+        } catch (error) {
+          failures.push("Groq: اتصال برقرار نشد");
+        }
+      } else {
+        failures.push("Groq: کلید API تنظیم نشده است");
+      }
+
+      return respond({
+        error: "All AI providers failed",
+        details: failures.join(" | ")
+      }, 502);
+
+    } catch (error) {
+      return respond({ error: "Server error" }, 500);
+    }
+  }
+};
