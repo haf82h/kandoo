@@ -1,7 +1,7 @@
-
+ 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
 };
 
@@ -31,8 +31,28 @@ export default {
         success: true,
         service: "kandoo-backend",
         status: "healthy",
-        version: "1.0.0",
+        database: "connected",
+        version: "1.1.0",
       });
+    }
+
+    if (url.pathname === "/api/db-test" && request.method === "GET") {
+      try {
+        const result = await env.DB.prepare(
+          "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
+        ).all();
+
+        return jsonResponse({
+          success: true,
+          database: "connected",
+          tables: result.results,
+        });
+      } catch (error) {
+        return jsonResponse({
+          success: false,
+          error: "Database connection failed",
+        }, 500);
+      }
     }
 
     return jsonResponse({
